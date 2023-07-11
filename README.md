@@ -5,7 +5,7 @@
 
 1. The overall purpose of the application:
 
-    - This application pre-configures a linear regression workflow which aims at streamlining several processes, by allowing the use of control hyperparameter scripts that instruct the program to produce and customize a comprehensive statistical analysis report, that can be exported into a PDF document. One of the main goals of the program is to allow the user to pick any data set (CSV) and conduct a fast and highly scalable and customizable analysis without having to write it from the ground up.
+    - This application pre-configures a linear regression workflow which aims at streamlining several statistical analysis processes, from exploratory data analysis up to predictive quality comparison between estimated models. To achieve this, a control script is set with a pre-defined number of hyperparameters that instructs the program to produce a customized and comprehensive statistical analysis report that can be exported into a PDF document. The main goal of the application is to allow the user to pick any data set and conduct a quick, scalable and customizable analysis that permits to easily visualize, modify and compare data, integrate support machine learning algorithms for feature selection and data randomization, produce multiple regressions and comprehensive batteries of error hypothesis testing, without having to always write the analysis from the ground up. 
 
 
 2. How the application can be used to address specific needs or objectives:
@@ -41,6 +41,7 @@
 
     - The benefits of this program are directly related with the use of a modular approach to the structure/framework of the analysis. Some of the benefits:
         - volume of code to be written decreases substantially
+        - multiple libraries loaded without the need to specify them  
         - code reuse:
             - extend sections of the analysis, e.g. multiple regressions
             - make multiple analysis of the same data set
@@ -82,14 +83,15 @@
 
     - Raise a customized error message every time a regression is trying to be fitted with a non-numeric variable. 
 
+    - Implement the option of standardization of data.
+
     - Include white test in the residual analysis and allow for the durbin-watson as an optional test (although there is no time series for this particular data set, feature for the generalized version). 
+
+    - Introduce leverage/influence points calculation, e.g. cooks's distance.
     
     - Include a mode estimation and MSE/RMSE test set analysis.
 
-    - Expand the analysis to error distribution, error metrics comparison, etc:
-        - Standardization of data.
-
-        - Allow for a more complex randomization of data sets in order to allow for a k-fold cross validation process, as well as bootstrap randomization.
+    - Allow for a more complex randomization of data sets in order to allow for a k-fold cross validation process, as well as bootstrap randomization.
 
     - Consider removing the 'print results' functions into their own module instead of having a bloated 'modelling' script.
 
