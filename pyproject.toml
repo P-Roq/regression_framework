@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "regression-framework"
+version = "0.1.0"
+description = ""
+authors = ["P-Roq"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "regression_framework"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.12"
+matplotlib = "3.7.1"
+pandas = "1.5.0"
+scikit-learn = "1.2.2"
+scipy = "1.9.1"
+seaborn = "0.12.2"
+statsmodels = "0.14.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
