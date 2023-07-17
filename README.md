@@ -5,7 +5,7 @@
 
 1. The overall purpose of the application:
 
-    - This application pre-configures a linear regression workflow which aims at streamlining several statistical analysis processes, from exploratory data analysis up to predictive quality comparison between estimated models. To achieve this, a control script is set with a pre-defined number of hyperparameters that instructs the program to produce a customized and comprehensive statistical analysis report that can be exported into a PDF document. The main goal of the application is to allow the user to pick any data set and conduct a quick, scalable and customizable analysis that permits to easily visualize, modify and compare data, integrate support machine learning algorithms for feature selection and data randomization, produce multiple regressions and comprehensive batteries of error hypothesis testing, without having to always write the analysis from the ground up. 
+    - This application pre-configures a linear regression workflow which aims at streamlining several statistical analysis processes, from exploratory data analysis up to predictive quality comparison between estimated models. To achieve this, a control script is set with a pre-defined number of hyperparameters that instructs the program to produce a customized and comprehensive statistical analysis report that can be exported into a PDF document. The main goal of the application is to allow the user to pick any data set and conduct a quick, scalable and customizable analysis that permits to easily visualize, modify and compare data, integrate support machine learning algorithms for feature selection and data randomization, produce multiple regressions and comprehensive batteries of error hypothesis testing, without having to always write the base code from the ground up, while resorting to a simplified, user friendly, set of commands. 
 
 
 2. How the application can be used to address specific needs or objectives:
@@ -41,7 +41,8 @@
 
     - The benefits of this program are directly related with the use of a modular approach to the structure/framework of the analysis. Some of the benefits:
         - volume of code to be written decreases substantially
-        - multiple libraries loaded without the need to specify them  
+        - multiple libraries loaded without the need to specify them or to explicitly use their specific classes, functions, methods, etc
+        - the ctrl script uses simplified syntax that is easier to use for users not familiarized with programming languages, instead of using   
         - code reuse:
             - extend sections of the analysis, e.g. multiple regressions
             - make multiple analysis of the same data set
