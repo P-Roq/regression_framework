@@ -9,6 +9,43 @@ import pandas as pd
 import numpy as np
 
 
+def describe_data(data_sets: dict, subset: Union[bool, str]) -> pd.core.frame.DataFrame:
+
+    if (subset is False):
+        return ''
+
+    allowed_subsets = ['main', 'train', 'validation', 'test']
+
+    if (subset not in allowed_subsets) and (isinstance(subset, bool) is False):
+        raise Exception("This variable can only be a boolean or one of the following strings:\n 'main', 'train', 'validation' or 'test'.")
+
+    if (len(data_sets) == 1):
+        if (subset != 'main') and (isinstance(subset, bool) is False):
+            raise Exception("The main data set hasn't been split.")
+        if (subset == 'main') or (subset is True):
+            subset = 'main'
+            description = data_sets['train'].describe()
+
+    if (len(data_sets) > 1):
+
+        if (subset is True) or (subset=='train'):
+            subset = 'train'
+            description = data_sets[subset].describe()
+
+        if subset == 'main':
+            description = data_sets['main'].describe()
+
+        if subset == 'validation':
+            description = data_sets['validation'].describe()
+
+        if subset == 'test':
+            description = data_sets['test'].describe()
+
+    print(f'\nVariable Description After Data Processing ({subset} set):\n')
+
+    return description
+
+    
 def correlation_table(df: pd.core.frame.DataFrame) -> None:
 
     corr = df.corr(method='pearson', numeric_only=True)

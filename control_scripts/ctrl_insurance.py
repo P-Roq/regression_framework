@@ -3,17 +3,20 @@ data_file_name = 'insurance.csv'
 
 # Control Section: choose which sections to run.
 identify_origin_script = True
+lower_case_columns = True
 print_columns = False
 data_description_1 = True
 check_na = False
-remove_na = False # remove all missing values
+remove_na = False 
+print_proportions = True
 data_description_2 = True
+summary_after_transformation = True
 drop_non_numeric = True
-correlations = True
+correlations = 'train'
 plug_feature_selection = False
 make_regression = False
 residuals_analysis = False
-residuals_set = 'train' # 'train' or 'validation'
+residuals_set = 'train' #
 error_comparison = False
 
 # Choose to store output.
@@ -26,13 +29,15 @@ initial_features = ['age', 'sex', 'bmi', 'children', 'smoker', 'region', 'charge
 target_container = ['charges', 'log_charges']
 
 # View data.
-# df_coordinates_1 = {'rows': [0, 5], 'columns': initial_features}
-# df_coordinates_2 = {'rows': [0, 5], 'columns': None}
+# data_view_1 = {'rows': [0, 5], 'columns': initial_features,}
+data_view_2 =  {}
+
 
 
 ### Data transformation.
 
-# replace_na_values = [
+# replace_values = [
+#     {'variable': , 'value': None, 'transform': 'standard_deviation', 'ddof': 2},
 #     ]
 
 # Binary to dummy, 3 keys: `variable`, `invert`, `drop_current`. 
@@ -41,8 +46,9 @@ convert_binary_to_dummy = [
     {'variable': 'smoker', 'invert': False, 'drop_current': True},
     ]
 
+# All keys: ('variable', 'add_suffix', 'drop_dummy', 'dummies_names', 'drop_current')
 # convert_nonbinary_to_dummies = [
-#     {'variable': 'region', 'add_suffix': None, 'drop_dummy': 1, 'dummies_names': None, 'drop_current': True},
+#     {'variable': 'region', 'drop_dummy': 1, 'drop_current': True},
 #     ]
 
 # Convert variables into their logs, 2 keys: `variable`, `drop_current`.
@@ -55,6 +61,16 @@ convert_to_categorical = [
     {'variable': 'region', 'drop_current': True},
 ]
 
+#### Split data.
+
+split_data = {
+    'rand_state': [5, 5],
+    'proportions': (0.6, 0.2,), 
+    'shuffle': False,
+    }
+
+# standardize_data = {'transform': 'z_score',  'include_binary': ['smoker_d'], 'round': 2} #'include_binary': True,   
+
 
 #### Data trimming
 
@@ -63,53 +79,76 @@ convert_to_categorical = [
 #     {'variable': 'charges', 'boundaries': 'upper', 'value': None, 'scaling_factor': None, 'z_score': None, 'ddof': None},
 #     ]
 
+# trimmer_container = [
+#     {'df': 'train', 'variable': 'charges', 'boundaries': 'lower', 'value': 10000},
+#     {'df': 'train', 'variable': 'charges', 'boundaries': 'lower', 'value': 15000},
+#     {'df': 'train', 'variable': 'charges', 'boundaries': 'lower', 'value': 20000},
+#     ]
+
 trimmer_container = [
-    {'variable': 'bmi', 'boundaries': 'upper', 'value': 45},
-    {'variable': 'charges', 'boundaries': 'both', 'z_score': (-1, 1)},
+    {'df': 'train', 'variable': 'charges', 'boundaries': 'upper', 'scaling_factor': 2.50},
+    {'df': 'train', 'variable': 'charges', 'boundaries': 'upper', 'scaling_factor': 1.50},
+    {'df': 'train', 'variable': 'charges', 'boundaries': 'upper', 'scaling_factor': 0.50},
     ]
 
 
 #### Data frame queries
 
 # Create variants of the main data frame for further analysis.
-queries_container = [
-    'smoker_d == 0',
-    'bmi > 30 & smoker_d == 1',
-    'bmi > 30 & smoker_d == 1 & sex_d == 1',
+# query_container = [
+#     {'df': 'all', 'query': 'smoker_d == 0'},
+#     {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1'},
+#     {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1 & sex_d == 1'},
+#     ]
+
+query_container = [
+    {'df': 'all', 'query': 'smoker_d == 1'},
+    {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1'},
+    {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1 & sex_d == 1'},
     ]
 
 # Scatter plot: visually observe the relation between two variables in different 
 # data frame variants produced by the values in `queries`. 
-df_variants_for_scatterplot = [0, 1, 2,]
+# df_variants_for_scatterplot = [0, 1, 2,]
 
-queries_scatter_variables = {'x': 'age', 'y': 'charges'}
+# queries_scatter_variables = {'x': 'age', 'y': 'charges'}
 
-# replace_for_trimmed = 0
+# scatterplot = {'df': 'main', 'container': 'query', 'index': 'all', 'x': 'age', 'y': 'charges'}
+
+
+# replace_for_trimmed = 3
 # replace_for_queried = 0  # change the main data frame for a queried version
 
 
 #### Visualization panels.
 
-# Allowed values in compare_visually['panel']: 'hist', 'box', 'scatter'. 
-compare_visually = {
-    'container': 'queries_container',
+display_panels = {
+    'df': ('train', 'train'),
+    'container': 'query', 
     'index': 0,
-    'panel': ['hist', 'box', 'scatter']
+    'panel': 'histogram',
     }
 
 
-hist_cols = ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges']
-boxplot_cols = ['age', 'bmi', 'children', 'charges']
-scatter_dict = {
+histograms = {
+    'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges'],
+    'bins': {'age': 5,},
+	'density': {'charges': True,},
+	'cumulative': {'bmi': True,}
+    }
+
+boxplots = ['age', 'bmi', 'children', 'charges']
+
+scatterplots = {
     'target': 'charges',
     'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat'],
     'title': None
     } # 'Scatter Plots: Features Vs Target'
-heatmap_cols = ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges']
+
+heatmap = ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges']
 
 
-#### Trim values
-
+#### Regressions preprocessing.
 
 #### VIF analysis.
 
@@ -120,21 +159,18 @@ heatmap_cols = ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'ch
 #     ['age', 'sex_d', 'bmi', 'children', 'smoker_d'],
 #     ]
 
-
-#### Regressions preprocessing.
-
 ## Feature selection.
 
-# If this list is empty, all the features in the main data set will be included. 
+# # If this list is empty, all the features in the main data set will be included. 
 # initial_features_fs = ['age', 'bmi', 'sex_d', 'children', 'smoker_d',]
 
-# 3 keys: `target`, `k_vars` and `criterion`.
-univariate_container = [
-    {'target': 'charges', 'k_vars': 4, 'criterion': 'f_regression'},
-    {'target': 'log_charges', 'k_vars': 4, 'criterion': 'f_regression'},
-    ]
+# # 3 keys: `target`, `k_vars` and `criterion`.
+# univariate_container = [
+#     {'target': 'charges', 'k_vars': 4, 'criterion': 'f_regression'},
+#     {'target': 'log_charges', 'k_vars': 4, 'criterion': 'f_regression'},
+#     ]
 
-# 3 keys: `target`, `k_vars` and `step`.
+# # 3 keys: `target`, `k_vars` and `step`.
 # recursive_elimination_container = [
 #     {'target': 'charges', 'k_vars': 4, 'step': 1},
 #     {'target': 'charges', 'k_vars': 4, 'step': 0.5},
@@ -156,21 +192,12 @@ univariate_container = [
 #     ]
 
 
-#### Split data.
-
-split_data_dict = {
-    'rand_state': 5,
-    'validation_size': 0.2, 
-    'test_size': 0.2,
-    'shuffle': True,
-    }
-
-
 ## Regression analysis.
-# RunRegression hyperparameters.
-manual_model_container = [
-    {'target': 'charges', 'x_vars': ['age', 'sex_d']},
-    {'target': 'charges', 'x_vars': ['age', 'sex_d', 'bmi']},
-    {'target': 'charges', 'x_vars': ['age', 'sex_d', 'smoker_d']},
-    {'target': 'charges', 'x_vars': ['age', 'sex_d', 'bmi', 'children', 'smoker_d']},
-    ]
+
+# # RunRegression hyperparameters.
+# manual_model_container = [
+#     {'target': 'charges', 'x_vars': ['age', 'sex_d',],},
+#     {'target': 'charges', 'x_vars': ['age', 'sex_d', 'bmi',],},
+#     {'target': 'charges', 'x_vars': ['age', 'sex_d', 'smoker_d',],},
+#     {'target': 'charges', 'x_vars': ['age', 'sex_d', 'bmi', 'children', 'smoker_d',],},
+#     ]

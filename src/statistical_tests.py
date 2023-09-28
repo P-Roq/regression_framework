@@ -13,20 +13,26 @@ from statsmodels.tools.tools import add_constant
 import pandas as pd
 import numpy as np
 
-def normality_tests(residuals):
+def normality_tests(residuals: pd.core.series.Series) -> pd.core.frame.DataFrame:
+    
+    normality_tests = pd.DataFrame(
+        {
+            'Statistic': [
+                shapiro_test(residuals)[0],
+                dagostino_test(residuals)[0],
+                kol_smir_test(residuals, 'norm')[0],
+                jarque_bera_test(residuals)[0],
+            ],
+            'p-value': [
+                shapiro_test(residuals)[1],
+                dagostino_test(residuals)[1],
+                kol_smir_test(residuals, 'norm')[1],
+                jarque_bera_test(residuals)[1],
+            ],
+        },
+        index = ['Shapiro-Wilk', "D'Agostino's", 'Kolmogorov-Smirnov', "Jarque-Bera"],  
+    )
+    
+    normality_tests.index.name = 'test'
 
-    normality_tests = {
-        'Shapiro-Wilk': shapiro_test(residuals),
-        "D'Agostino's": dagostino_test(residuals),
-        'Kolmogorov-Smirnov': kol_smir_test(residuals, 'norm'),
-        "Jarque-Bera": jarque_bera_test(residuals),
-    }
-
-    for key in normality_tests:
-        stat = round(normality_tests[key][0], 4)
-        p_value = round(normality_tests[key][1], 4)
-
-        print(f"Test: {key}")
-        print(f'    - Statistic: {stat}, p-value: {p_value}')
-
-    return
+    return normality_tests.round(4)

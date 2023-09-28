@@ -17,7 +17,7 @@ def check_if_numeric(
 
     is_numeric = [is_numeric_dtype(df[col]) for col in columns]
 
-    if (all(is_numeric) is False) & (show_not_numeric is True):
+    if (all(is_numeric) is False) and (show_not_numeric is True):
         non_numeric = []
         for i, value in enumerate(is_numeric):
             if is_numeric[i] is False:

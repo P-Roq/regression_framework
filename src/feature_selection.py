@@ -1,3 +1,5 @@
+from typing import Union
+
 import pandas as pd 
 import numpy as np 
 import re
@@ -6,7 +8,6 @@ from sklearn.linear_model import LinearRegression as lr
 from sklearn.feature_selection import SelectKBest, RFE, SequentialFeatureSelector, SelectFromModel
 from sklearn.feature_selection import chi2, f_classif, f_regression
 
-from typing import Union
 
 class Feat_Selector:
     def __init__(self):
@@ -33,7 +34,7 @@ class Feat_Selector:
         ) -> list:
 
         if isinstance(k_vars, int):
-            if (k_vars <= 0) | (k_vars >= len(self.X)):
+            if (k_vars <= 0) or (k_vars >= len(self.X)):
                 raise ValueError('Error: the number of features to select, `k_vars`, must be higher than 0 and lower than initial number of variables contained in `selector_x_vars`.')
 
         if criterion == 'chi2':
@@ -78,7 +79,7 @@ class Feat_Selector:
         ) -> list:
 
         if isinstance(k_vars, int):
-            if (k_vars <= 0) | (k_vars >= len(self.X)):
+            if (k_vars <= 0) or (k_vars >= len(self.X)):
                 raise ValueError('Error: the number of features to select, `k_vars`, must be higher than 0 and lower than initial number of variables contained in `selector_x_vars`.')
 
 
@@ -106,7 +107,7 @@ class Feat_Selector:
         ) -> list:
 
         if isinstance(k_vars, int):
-            if (k_vars <= 0) | (k_vars >= len(self.X)):
+            if (k_vars <= 0) or (k_vars >= len(self.X)):
                 raise ValueError('Error: the number of features to select, `k_vars`, must be higher than 0 and lower than initial number of variables contained in `selector_x_vars`.')
 
         if direction not in ['forward', 'backward']:
@@ -140,7 +141,7 @@ class Feat_Selector:
         ) -> list:
 
         if isinstance(k_vars, int):
-            if (k_vars <= 0) | (k_vars >= len(self.X)):
+            if (k_vars <= 0) or (k_vars >= len(self.X)):
                 raise ValueError('Error: the number of features to select, `k_vars`, must be higher than 0 and lower than initial number of variables contained in `selector_x_vars`.')
 
 
