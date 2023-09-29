@@ -213,15 +213,15 @@ def main() -> None:
 
 
     #### TRIMMING
-    if hasattr(c, 'trimmer_container'):
+    if hasattr(c, 'trim_container'):
         
         trimmer = dt.Trim_Data()
 
-        # We store for each element in `c.trimmer_container` the data set(s) trimmed versions.
-        trimmed_storage = {i: {} for i in range(len(c.trimmer_container))}
+        # We store for each element in `c.trim_container` the data set(s) trimmed versions.
+        trimmed_storage = {i: {} for i in range(len(c.trim_container))}
 
         i = 0
-        for dic in c.trimmer_container:
+        for dic in c.trim_container:
             full_dic = ut.unfold_dictionary(dic, dt.Trim_Data.keys)
 
             to_trim = None
@@ -250,9 +250,9 @@ def main() -> None:
 
             i += 1    
 
-        # If an element in `c.trimmer_container` only trims a specific data set, `trimmed_storage` will
+        # If an element in `c.trim_container` only trims a specific data set, `trimmed_storage` will
         # fill for that element the associated dictionary with references to the untrimmed versions of
-        # remaining data sets. E.g if `c.trimmer_container = [{'df': ['train', 'validation'], '...': '...'}]`, then
+        # remaining data sets. E.g if `c.trim_container = [{'df': ['train', 'validation'], '...': '...'}]`, then
         #  `trimmed_storage = {0: {'main': not_trimmed, 'train': trimmed, 'validation': trimmed, 'test': not_trimmed}}`.
         if split:
             for key in trimmed_storage:
@@ -385,8 +385,8 @@ def main() -> None:
         if split is False and (full_dic['df'] not in ['main', 'train']):
             raise Exception(f"The main data set hasn't been split, therefore, the `df` cannot be set to '{full_dic['df']}'.")
 
-        if (full_dic['container'] == 'trim') and not hasattr(c, 'trimmer_container'):
-            raise Exception("`trimmer_container` hasn't been found.")
+        if (full_dic['container'] == 'trim') and not hasattr(c, 'trim_container'):
+            raise Exception("`trim_container` hasn't been found.")
         if (full_dic['container'] == 'query') and not hasattr(c, 'query_container'):
             raise Exception("`query_container` hasn't been found.")
             
@@ -394,19 +394,19 @@ def main() -> None:
 
         if full_dic['index'] == 'all':
             if full_dic['container'] == 'trim':
-                full_dic['index'] = list(range(len(c.trimmer_container)))
+                full_dic['index'] = list(range(len(c.trim_container)))
             if full_dic['container'] == 'query':
                 full_dic['index'] = list(range(len(c.query_container)))
 
-        if hasattr(c, 'trimmer_container') and (full_dic['container'] == 'trim'):
-            if all([False for i in full_dic['index'] if i not in range(len(c.trimmer_container))]) is False:
-                raise Exception('At least one scatterplot index value is outside the `trimmer_container` length.')
+        if hasattr(c, 'trim_container') and (full_dic['container'] == 'trim'):
+            if all([False for i in full_dic['index'] if i not in range(len(c.trim_container))]) is False:
+                raise Exception('At least one scatterplot index value is outside the `trim_container` length.')
        
         selected_sets = [unfolded_all_data_sets[set][full_dic['df']] for set in unfolded_all_data_sets]
         selected_sets = [selected_sets[i] for i in full_dic['index']]
 
         if full_dic['container'] == 'trim':
-            container = c.trimmer_container
+            container = c.trim_container
         if full_dic['container'] == 'query':
             container = [dic[full_dic['container']] for dic in c.query_container]
 
@@ -426,8 +426,10 @@ def main() -> None:
 
     
     if hasattr(c, 'display_panels'):
-        panel_comparison = dv.Display_Panels(c.display_panels, split)
-        panel_comparison.append_data(all_data_sets=all_data_sets)
+        panel_comparison = dv.Display_Panels(c.display_panels, all_data_sets, split)
+        panel_comparison.type_check
+        panel_comparison.check_input_validity
+        panel_comparison.append_data
                    
         if hasattr(c, 'histograms'):
             full_dic = ut.unfold_dictionary(c.histograms, dv.Histogram.keys)

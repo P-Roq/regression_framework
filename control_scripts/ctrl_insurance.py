@@ -63,11 +63,11 @@ convert_to_categorical = [
 
 #### Split data.
 
-split_data = {
-    'rand_state': [5, 5],
-    'proportions': (0.6, 0.2,), 
-    'shuffle': False,
-    }
+# split_data = {
+#     'rand_state': [5, 5],
+#     'proportions': (0.6, 0.2,), 
+#     'shuffle': False,
+#     }
 
 # standardize_data = {'transform': 'z_score',  'include_binary': ['smoker_d'], 'round': 2} #'include_binary': True,   
 
@@ -85,27 +85,27 @@ split_data = {
 #     {'df': 'train', 'variable': 'charges', 'boundaries': 'lower', 'value': 20000},
 #     ]
 
-trimmer_container = [
-    {'df': 'train', 'variable': 'charges', 'boundaries': 'upper', 'scaling_factor': 2.50},
-    {'df': 'train', 'variable': 'charges', 'boundaries': 'upper', 'scaling_factor': 1.50},
-    {'df': 'train', 'variable': 'charges', 'boundaries': 'upper', 'scaling_factor': 0.50},
-    ]
+# trimmer_container = [
+#     {'df': 'train', 'variable': 'charges', 'boundaries': 'upper', 'scaling_factor': 2.50},
+#     {'df': 'train', 'variable': 'charges', 'boundaries': 'upper', 'scaling_factor': 1.50},
+#     {'df': 'train', 'variable': 'charges', 'boundaries': 'upper', 'scaling_factor': 0.50},
+#     ]
 
 
 #### Data frame queries
 
 # Create variants of the main data frame for further analysis.
-# query_container = [
-#     {'df': 'all', 'query': 'smoker_d == 0'},
-#     {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1'},
-#     {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1 & sex_d == 1'},
-#     ]
-
 query_container = [
-    {'df': 'all', 'query': 'smoker_d == 1'},
+    {'df': 'all', 'query': 'smoker_d == 0'},
     {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1'},
     {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1 & sex_d == 1'},
     ]
+
+# query_container = [
+#     {'df': 'all', 'query': 'smoker_d == 1'},
+#     {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1'},
+#     {'df': 'all', 'query': 'bmi > 30 & smoker_d == 1 & sex_d == 1'},
+#     ]
 
 # Scatter plot: visually observe the relation between two variables in different 
 # data frame variants produced by the values in `queries`. 
@@ -124,9 +124,9 @@ query_container = [
 
 display_panels = {
     'df': ('train', 'train'),
-    'container': 'query', 
-    'index': 0,
-    'panel': 'histogram',
+    'container': (None,'query',), 
+    'index': (None, 6),
+    'panel': ['scatterplot',],
     }
 
 
@@ -144,6 +144,7 @@ scatterplots = {
     'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat'],
     'title': None
     } # 'Scatter Plots: Features Vs Target'
+
 
 heatmap = ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges']
 

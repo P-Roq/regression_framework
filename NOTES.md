@@ -94,12 +94,12 @@ Activated by the dictionary `standardize_data` (control script):
 
 ## Trim Data
 
-The user can create several versions of the data frame by trimming the data by different methods. For that, a class has been created - `Trim_Data`, that has a function - `trim_data()`; the `trimmer_container` stores the dictionaries with the trimming specifications as well as the parameter that specifies which subsets to apply the trimming; this parameter - 'df', can take the following values:
+The user can create several versions of the data frame by trimming the data by different methods. For that, a class has been created - `Trim_Data`, that has a function - `trim_data()`; the `trim_container` stores the dictionaries with the trimming specifications as well as the parameter that specifies which subsets to apply the trimming; this parameter - 'df', can take the following values:
     - `'main'`, `'train'`, `'validation'`, `'test'` to trim an individual data set; If the data is split, this parameter accepts a list or a tuple with that allows to choose more than one of the available data sets, e.g. `['validation', 'test']`.   
     - `'all'` and `None`, tries to apply the trimming to all sets available (if there was no split only the main data frame is trimmed).
     - if omitted, `'df'` replicates the `'all'` behavior. 
 
-To replace the data frame(s) to be further transformed/analyzed by a trimmed version(s) we set `replace_for_trimmed` with an integer identical to the index of the dictionary in `trimmer_container` from which the resultant data frame was derived from.
+To replace the data frame(s) to be further transformed/analyzed by a trimmed version(s) we set `replace_for_trimmed` with an integer identical to the index of the dictionary in `trim_container` from which the resultant data frame was derived from.
 
 The function `trim_data()` allows the user to trim the data frame using 3 different methods that are defined by the parameter(s) used:
     - `value` sets fixed thresholds values.
@@ -149,7 +149,7 @@ Parameters:
         - One of the sets: 'main', 'train', 'validation', 'test'.  
         - If omitted or None is passed, `df: train.`
     - `container`: str
-        - One of the containers - 'trim' or 'query', given that the associated container - `trimmer_container` or `query_container` have been activated.
+        - One of the containers - 'trim' or 'query', given that the associated container - `trim_container` or `query_container` have been activated.
     - `index`: list[int], None
         - Given a container, which modified versions to choose from, e.g. if `query_container` has 5 dictionaries that produce 5 that modify the specified data set in 5 different ways. If the user wants to compare the 1st and the 4th versions the index will be `[0, 3]`. 
         - If `'all'` is passed, all the versions in the container will be fitted in the scatter plot. 

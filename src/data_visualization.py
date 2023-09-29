@@ -12,76 +12,115 @@ import statsmodels.api as sm
 @dataclass
 class Display_Panels:
 
-    def __init__(self, ctrl_display_panels: dict, split: bool):
+    def __init__(self, ctrl_display_panels: dict, all_data_sets_: dict, split: bool,):
         self.keys = ['df', 'container', 'index', 'panel']
 
         only_nones = {key: None for key in self.keys if key not in ctrl_display_panels.keys()}
-        full_dic = {**ctrl_display_panels, **only_nones}
+        self.full_dic = {**ctrl_display_panels, **only_nones}
     
+        self.all_data_sets = all_data_sets_
+        self.split = split
         self.df_1: pd.core.frame.DataFrame = None
         self.df_2_hist: pd.core.frame.DataFrame = None
         self.df_2_box: pd.core.frame.DataFrame = None
         self.df_2_scatter: pd.core.frame.DataFrame = None
 
-        # if not (set(self.keys) == set(list(ctrl_display_panels.keys()))):
-        #     raise Exception('At least one is key is missing in `display_panels`.')
-
-        if isinstance(full_dic['df'], (list, tuple)):
-            self.df_1_hp = full_dic['df'][0] 
-            self.df_2_hp = full_dic['df'][1]
-        if isinstance(full_dic['df'], str):
-            self.df_1_hp = full_dic['df']
+        if isinstance(self.full_dic['df'], (list, tuple)):
+            self.df_1_hp = self.full_dic['df'][0] 
+            self.df_2_hp = self.full_dic['df'][1]
+        if isinstance(self.full_dic['df'], str):
+            self.df_1_hp = self.full_dic['df']
             self.df_2_hp = None
-        if full_dic['df'] is None:
+        if self.full_dic['df'] is None:
             self.df_1_hp = 'train' 
             self.df_2_hp = None
 
-        if isinstance(full_dic['container'], (list, tuple)):
-            self.container_1_hp = full_dic['container'][0] 
-            self.container_2_hp = full_dic['container'][1]
-        if isinstance(full_dic['container'], str):
-            self.container_1_hp = full_dic['container'] 
+        if isinstance(self.full_dic['container'], (list, tuple)):
+            self.container_1_hp = self.full_dic['container'][0] 
+            self.container_2_hp = self.full_dic['container'][1]
+        if isinstance(self.full_dic['container'], str):
+            self.container_1_hp = self.full_dic['container'] 
             self.container_2_hp = None
-        if full_dic['container'] is None:
+        if self.full_dic['container'] is None:
             self.container_1_hp = None 
             self.container_2_hp = None
 
-        if isinstance(full_dic['index'], (list, tuple)):
-            self.index_1_hp = full_dic['index'][0] 
-            self.index_2_hp = full_dic['index'][1] 
-        if isinstance(full_dic['index'], int):
-            self.index_1_hp = full_dic['index'] 
+        if isinstance(self.full_dic['index'], (list, tuple)):
+            self.index_1_hp = self.full_dic['index'][0] 
+            self.index_2_hp = self.full_dic['index'][1] 
+        if isinstance(self.full_dic['index'], int):
+            self.index_1_hp = self.full_dic['index'] 
             self.index_2_hp = None 
-        if full_dic['index'] is None:
+        if self.full_dic['index'] is None:
             self.index_1_hp = None 
             self.index_2_hp = None
 
-        if isinstance(full_dic['panel'], (list, tuple, str)):
-            self.panel_hp = full_dic['panel'] 
-        if full_dic['index'] is None:
+        if isinstance(self.full_dic['panel'], (list, tuple, str)):
+            self.panel_hp = self.full_dic['panel'] 
+        if self.full_dic['index'] is None:
             self.panel_hp = None 
 
-        if (split is False) and (self.df_1_hp == 'main'):
+        if (self.split is False) and (self.df_1_hp == 'main'):
             self.df_1_hp = 'train' 
-        
-
+    
     @property
     def type_check(self,):
-        pass  
+        if isinstance(self.full_dic['df'], str):
+            if self.full_dic['df'] not in ['main', 'train']:
+                raise Exception("If the main data set has not been split, `df` can only take two values: 'main' or 'train' (point to the same data set).")
+            if (self.full_dic['container'] is not None) and (self.full_dic['container'] not in ['query', 'trim']):
+                raise Exception("Only one data set has been selected in 'df', therefore the value in 'container' must be a string ('query' or 'trim') or `None`'")
+        
+        if isinstance(self.full_dic['df'], (list, tuple)):
+            if len(self.full_dic['df']) != 2:
+                raise Exception(f"If 'df' is a {type(self.full_dic['df'])}, it can only take two values - one for each data set.")
 
-    def append_data(self, all_data_sets: dict) -> None:
+        if self.full_dic['container'] is None:
+            if self.full_dic['index'] is not None:
+                raise Exception('No container has been selected, therefore an index cannot be passed as in input.')
+
+        if isinstance(self.full_dic['container'], (list, tuple)):
+            if len(self.full_dic['container']) != 2:
+                raise Exception(f"If 'container' is a {type(self.full_dic['container'])}, it can only take two values - one for each data set.")
+
+        return  
+
+    @property
+    def check_input_validity(self,):
+        if (self.full_dic['container'] == 'query') or ('query' in self.full_dic['container']):
+            if self.all_data_sets['query'] is None:
+                raise Exception('There are no queried versions available (check the `query_container`).')
+
+            query_container_index = list(self.all_data_sets['query'].keys())
+            if (self.container_1_hp == 'query'):
+                if self.index_1_hp not in query_container_index:
+                    raise Exception(f'The index specified for the query container, {self.index_1_hp}, does not correspond to any of the elements in the `query_container`. ')
+            
+            if (self.container_2_hp == 'query'):
+                if self.index_2_hp not in query_container_index:
+                    raise Exception(f'The index specified for the query container, {self.index_2_hp}, does not correspond to any of the elements in the `query_container`. ')
+
+        if (self.full_dic['container'] == 'trim') or ('trim' in self.full_dic['container']):
+            if self.all_data_sets['trim'] is None:
+                raise Exception('There are no trimmed versions available (check the `trim_container`).')
+
+
+
+    @property
+    def append_data(self,) -> None:
+
         if self.container_1_hp is None:
             self.container_1_hp = 'processed'
-            self.df_1 = all_data_sets[self.container_1_hp][self.df_1_hp]
+            self.df_1 = self.all_data_sets[self.container_1_hp][self.df_1_hp]
         else:
-            self.df_1 = all_data_sets[self.container_1_hp][self.index_1_hp][self.df_1_hp]
+            self.df_1 = self.all_data_sets[self.container_1_hp][self.index_1_hp][self.df_1_hp]
         
         if self.df_2_hp:
             if self.container_2_hp is None:
                 self.container_2_hp = 'processed'
-                self.df_2 = all_data_sets[self.container_2_hp][self.df_2_hp]
+                self.df_2 = self.all_data_sets[self.container_2_hp][self.df_2_hp]
             else:
-                self.df_2 = all_data_sets[self.container_2_hp][self.index_2_hp][self.df_2_hp]
+                self.df_2 = self.all_data_sets[self.container_2_hp][self.index_2_hp][self.df_2_hp]
 
             if ('histogram' in self.panel_hp) or (self.panel_hp == 'histogram'):
                 self.df_2_hist = self.df_2
