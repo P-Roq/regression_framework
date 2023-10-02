@@ -167,8 +167,6 @@ To display the graph panels the user first sets up the `display_panels` with the
     - `histograms`
     - `boxplots`
     - `scatterplots`
-    - `heatmap`
-
 
     - `df`: tuple[str, str], list[str, str]
         - 
