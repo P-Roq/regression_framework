@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+<<<<<<< HEAD
+=======
+#vscode
+>>>>>>> 2e025faf4699278ee9e26287fc5c0a27e757129e
 .vscode
 
 # C extensions
