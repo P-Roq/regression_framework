@@ -20,8 +20,8 @@ def result_printer(results: dict) -> None:
 
 class RunRegressions:
     def __init__(self):
-        self.train = None # dataframe
-        self.validation = None # dataframe
+        self.train: pd.core.frame.DataFrame = None 
+        self.validation: pd.core.frame.DataFrame = None 
         self.X: list = []
         self.y: list = []
         self.detail: list = []
@@ -77,14 +77,14 @@ class RunRegressions:
             'prediction_validation': prediction_validation,
             }
 
-    def produce_specific_result(self, store_index: int):
+    def produce_specific_result(self, store_index: int) -> None:
         result = self.reg_results(x_vars[store_index], target[store_index], self.train, self.validation)
         self.results_store.append(result)
 
         return
 
 
-    def produce_all_results(self):
+    def produce_all_results(self) -> None:
         for x_vars, target in zip(self.X, self.y):
             result = self.reg_results(x_vars, target, self.train, self.validation)
             self.results_store.append(result)
@@ -92,7 +92,7 @@ class RunRegressions:
         return
 
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         print('## Summary:\n')
         for i, tuple_ in enumerate(zip(self.detail, self.y, self.X,)):
             print(f'Regression Nr: {i+1}:')
@@ -109,7 +109,7 @@ class RunRegressions:
         return result_printer(self.results_store[store_index: int])      
 
 
-    def print_all_results(self, residuals_analysis: bool, residuals_set: str):
+    def print_all_results(self, residuals_analysis: bool, residuals_set: str) -> None:
 
         for i, result_dict in enumerate(self.results_store):
 
@@ -136,9 +136,9 @@ class RunRegressions:
                 if residuals_set == 'validation':
                     df_resids = self.validation.copy()
 
-                print(f'\n## Residuals Analysis for the {residuals_set} set.\n')
+                print(f'\n## Residuals Analysis ({residuals_set} set).\n')
 
-                normality_tests(result_dict[f'residuals_{residuals_set}'])
+                print(normality_tests(result_dict[f'residuals_{residuals_set}']))
 
                 # Residuals vs target.            
                 dv.resid_visual_analysis_1(
@@ -159,7 +159,6 @@ class RunRegressions:
             if i == len(self.results_store) - 1:
                 print('** [No more experiments] **\n')
             
-
         return
 
     def compare_error_results(self) -> None:

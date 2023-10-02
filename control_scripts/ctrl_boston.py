@@ -4,15 +4,17 @@ data_file_name = 'boston_housing.csv'
 
 # Control Section: choose which sections to run.
 identify_origin_script = True
+lower_case_columns = False
 print_columns = False
 data_description_1 = True
 check_na = True
-remove_na = False # remove all missing values
+remove_na = True # remove all missing values
+print_proportions = True
 data_description_2 = False
-drop_non_numeric = True
-correlations = True
-plug_feature_selection = True
-make_regression = True
+drop_non_numeric = False
+correlations = False
+plug_feature_selection = False
+make_regression = False
 residuals_analysis = False
 residuals_set = 'train' # 'train' or 'validation'
 error_comparison = False
@@ -27,19 +29,30 @@ initial_features = ['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'R
 target_container = ['MEDV']
 
 # View data.
-# df_coordinates_1 = {'rows': [0, 10], 'columns': initial_features}
-# df_coordinates_2 = {'rows': [0, 10], 'columns': None}
+df_coordinates_1 = {'rows': [0, 15],}
+df_coordinates_2 = {'df': 'validation', 'rows': [0, 10], 'columns': None}
 
 ### Data transformation.
 
-replace_na_values = [
-    {'variable': 'CRIM', 'value': None, 'other': 'standard_deviation', 'ddof': 2},
-    {'variable': 'ZN', 'value': None, 'other': 'median', 'ddof': None},
-    {'variable': 'INDUS', 'value': None, 'other': 'median', 'ddof': None},
-    {'variable': 'CHAS', 'value': None, 'other': 'median', 'ddof': None},
-    {'variable': 'AGE', 'value': None, 'other': 'median', 'ddof': None},
-    {'variable': 'LSTAT', 'value': None, 'other': 'median', 'ddof': None},
-]
+# replace_values = [
+#     {'variable': 'RAD', 'replace': [1, 12, 14], 'value': 'replaced',},
+#     {'variable': 'LSTAT', 'replace': 'missing_values', 'transform': 'quantile=0.75', 'ddof': None,},
+#     {'variable': 'NOX', 'replace': 'missing_values', 'transform': 'mean',},
+#     {'variable': 'AGE', 'replace': 189, 'value': 'replaced',},
+# ]
+
+# rolling_window = [
+#     {'variable': 'RM', 'rows': 5, 'drop_current': True},
+#     {'variable': 'NOX', 'rows': 3, 'transform': 'standard_deviation', 'ddof': 2},
+#     {'variable': 'CRIM', 'rows': 3, 'transform': 'mean', 'replace_na_values': True, 'one_ahead': True},
+# ]
+
+
+# percentage_change = [
+#     {'variable': 'RM', 'rows': 5, 'replace_na': True},
+#     {'variable': 'NOX', 'replace_na': 4, 'differences_only': True},
+# ]
+
 
 # Binary to dummy, 3 keys: 'variable', 'invert', 'drop_current'. 
 # convert_binary_to_dummy = [
@@ -62,8 +75,26 @@ replace_na_values = [
 # ]
 
 
+#### Split data.
+
+split_data = {
+    'rand_state': 5,
+    'proportions': (0.6, 0.2,), 
+    'shuffle': True,
+    }
+
+# standardize_data = {'std_type': 'z_score',  'include_binary': ['smoker_d'], 'round': 2} #'include_binary': True,   
+
+
+#### Data trimming
+
+trimmer_container = []
+
+
+#### Data frame queries
+
 # Create variants of the main data frame for further analysis.
-# queries = [
+# queries_container = [
 #     ]
 
 # Scatter plot: visually observe the relation between two variables in different 
@@ -71,21 +102,38 @@ replace_na_values = [
 # df_variants_for_scatterplot = [
 #     ]
 
-# queries_scatter_variables = {'x': 'age', 'y': 'charges'}
+# scatterplot = {'df': 'train', 'container': 'trim', 'index': [],'x': '', 'y': ''}
 
-# main_df = queries[0]  # change the main data frame for a queried version
+# replace_for_trimmed = 0
+# replace_for_queried = 0  
 
 
-#### Visualization.
+#### Visualization panels.
 
-# hist_cols = initial_features
-# boxplot_cols = initial_features
-heatmap_cols = initial_features 
-# scatter_dict = {
-#     'target': target_container[0],
-#     'features': initial_features,
-#     'title': 'Scatter Plots: Features Vs Target'
+# Allowed values in compare_visually['panel']: 'hist', 'box', 'scatter'. 
+# compare_visually = {
+#     'container': 'queries_container',
+#     'index': 0,
+#     'panel': ['hist', 'box', 'scatter']
 #     }
+
+
+# hist_params = {
+#     'features': [],
+#     'bins': {'': 5,},
+# 	  'density': {'': True,},
+# 	  'cumulative': {'': True,}
+#     }
+
+# boxplot_cols = ['age', 'bmi', 'children', 'charges']
+
+# scatterplots = {
+#     'target': '',
+#     'features': [],
+#     'title': None
+#     } # 'Scatter Plots: Features Vs Target'
+
+# heatmap_cols = []
 
 
 #### VIF analysis.
@@ -133,17 +181,8 @@ importance_weights_container = [
     ]
 
 
-#### Split data.
-
-split_data_dict = {
-    'rand_state': 5,
-    'validation_size': 0.2, 
-    'test_size': 0.2,
-    'shuffle': True,
-    }
-
-
 ## Regression analysis.
+
 # RunRegression hyperparameters.
 manual_model_container = [
     {'target': 'charges', 'x_vars': ['age', 'sex_d']},

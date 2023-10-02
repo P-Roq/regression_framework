@@ -1,12 +1,151 @@
+from typing import Union
+
+from dataclasses import dataclass
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches # for custom legends in the graphs
 import seaborn as sns
 import statsmodels.api as sm
 
-import matplotlib.patches as mpatches # for custom legends in the graphs
+from src.utils import unfold_dictionary
 
-def find_number_of_rows(nr_of_axes):
+    
+@dataclass
+class Display_Panels:
+
+    def __init__(self, ctrl_display_panels: dict, all_data_sets_: dict, split: bool,):
+        self.keys = ['df', 'container', 'index', 'panel']
+
+        # only_nones = {key: None for key in self.keys if key not in ctrl_display_panels.keys()}
+        # self.full_dic = {**ctrl_display_panels, **only_nones}
+        self.full_dic = unfold_dictionary(ctrl_display_panels, self.keys)
+    
+        self.all_data_sets = all_data_sets_
+        self.split = split
+        self.df_1: pd.core.frame.DataFrame = None
+        self.df_2_hist: pd.core.frame.DataFrame = None
+        self.df_2_box: pd.core.frame.DataFrame = None
+        self.df_2_scatter: pd.core.frame.DataFrame = None
+
+        if isinstance(self.full_dic['df'], (list, tuple)):
+            self.df_1_hp = self.full_dic['df'][0] 
+            self.df_2_hp = self.full_dic['df'][1]
+        if isinstance(self.full_dic['df'], str):
+            self.df_1_hp = self.full_dic['df']
+            self.df_2_hp = None
+        if self.full_dic['df'] is None:
+            self.df_1_hp = 'train' 
+            self.df_2_hp = None
+
+        if isinstance(self.full_dic['container'], (list, tuple)):
+            self.container_1_hp = self.full_dic['container'][0] 
+            self.container_2_hp = self.full_dic['container'][1]
+        if isinstance(self.full_dic['container'], str):
+            self.container_1_hp = self.full_dic['container'] 
+            self.container_2_hp = None
+        if self.full_dic['container'] is None:
+            self.container_1_hp = None 
+            self.container_2_hp = None
+
+        if isinstance(self.full_dic['index'], (list, tuple)):
+            self.index_1_hp = self.full_dic['index'][0] 
+            self.index_2_hp = self.full_dic['index'][1] 
+        if isinstance(self.full_dic['index'], int):
+            self.index_1_hp = self.full_dic['index'] 
+            self.index_2_hp = None 
+        if self.full_dic['index'] is None:
+            self.index_1_hp = None 
+            self.index_2_hp = None
+
+        if isinstance(self.full_dic['panel'], (list, tuple, str)):
+            self.panel_hp = self.full_dic['panel'] 
+        if self.full_dic['index'] is None:
+            self.panel_hp = None 
+
+        if (self.split is False) and (self.df_1_hp == 'main'):
+            self.df_1_hp = 'train' 
+
+        if ((self.container_1_hp is None) and (self.container_2_hp is None)):
+            self.full_dic['index'] == (None, None)
+    
+    @property
+    def type_check(self,):
+        if isinstance(self.full_dic['df'], str):
+            if self.full_dic['df'] not in ['main', 'train']:
+                raise Exception("If the main data set has not been split, `df` can only take two values: 'main' or 'train' (point to the same data set).")
+            if (self.full_dic['container'] is not None) and (self.full_dic['container'] not in ['query', 'trim']):
+                raise Exception("Only one data set has been selected in 'df', therefore the value in 'container' must be a string ('query' or 'trim') or `None`'")
+        
+        if isinstance(self.full_dic['df'], (list, tuple)):
+            if len(self.full_dic['df']) != 2:
+                raise Exception(f"If 'df' is a {type(self.full_dic['df'])}, it can only take two values - one for each data set.")
+
+        if (self.full_dic['container'] is None) or ((self.container_1_hp is None) and (self.container_2_hp is None)):
+            if (self.full_dic['index'] is not None) and (self.full_dic['index'] == (None, None)):
+                raise Exception('No container has been selected, therefore an index cannot be passed as in input.')
+
+        if isinstance(self.full_dic['container'], (list, tuple)):
+            if len(self.full_dic['container']) != 2:
+                raise Exception(f"If 'container' is a {type(self.full_dic['container'])}, it can only take two values - one for each data set.")
+
+        if isinstance(self.full_dic['index'], (list, tuple)):
+            if len(self.full_dic['index']) != 2:
+                raise Exception(f"If 'index' is a {type(self.full_dic['index'])}, it can only take two values - one for each container.")
+
+        return  
+
+    @property
+    def check_input_validity(self,):
+        if (self.full_dic['container'] == 'query') or ('query' in self.full_dic['container']):
+            if self.all_data_sets['query'] is None:
+                raise Exception('There are no queried versions available (check the `query_container`).')
+
+            query_container_index = list(self.all_data_sets['query'].keys())
+            if (self.container_1_hp == 'query'):
+                if self.index_1_hp not in query_container_index:
+                    raise Exception(f'The index specified for the query container, `{self.index_1_hp}`, does not correspond to any of the elements in the `query_container`. ')
+            
+            if (self.container_2_hp == 'query'):
+                if self.index_2_hp not in query_container_index:
+                    raise Exception(f'The index specified for the query container, `{self.index_2_hp}`, does not correspond to any of the elements in the `query_container`. ')
+
+        if (self.full_dic['container'] == 'trim') or ('trim' in self.full_dic['container']):
+            if self.all_data_sets['trim'] is None:
+                raise Exception('There are no trimmed versions available (check the `trim_container`).')
+
+        # if (isinstance(self.full_dic['container'], (tuple, list))) and (isinstance(self.full_dic['index'], (tuple, list))) 
+
+        return
+
+
+    @property
+    def append_data(self,) -> None:
+
+        if self.container_1_hp is None:
+            self.container_1_hp = 'processed'
+            self.df_1 = self.all_data_sets[self.container_1_hp][self.df_1_hp]
+        else:
+            self.df_1 = self.all_data_sets[self.container_1_hp][self.index_1_hp][self.df_1_hp]
+        
+        if self.df_2_hp:
+            if self.container_2_hp is None:
+                self.container_2_hp = 'processed'
+                self.df_2 = self.all_data_sets[self.container_2_hp][self.df_2_hp]
+            else:
+                self.df_2 = self.all_data_sets[self.container_2_hp][self.index_2_hp][self.df_2_hp]
+
+            if ('histogram' in self.panel_hp) or (self.panel_hp == 'histogram'):
+                self.df_2_hist = self.df_2
+            if ('boxplot' in self.panel_hp) or (self.panel_hp == 'boxplot'):
+                self.df_2_box = self.df_2
+            if ('scatterplot' in self.panel_hp) or (self.panel_hp == 'scatterplot'):
+                self.df_2_scatter = self.df_2   
+
+        return 
+
+
+def find_number_of_rows(nr_of_axes: str) -> str:
     """Support function that takes the number of axis/graphs to include in the panel and 
     calculates the number of necessary rows to include in the panel with 3 columns. 
     Example: if we panel to include 8 graphs in the panel the number of rows to be 
@@ -20,54 +159,103 @@ def find_number_of_rows(nr_of_axes):
 
     return number_of_rows  
 
+class Histogram:
+    keys = ['var_list', 'bins_input', 'density_input', 'cumulative_input', 'df1', 'df2']
 
-# Histograms panel.
-def histogram_panel(
-        var_list: list,
-        df1: pd.core.frame.DataFrame,
-        df2: pd.core.frame.DataFrame = None,
-        ) -> None:
+    def histogram_panel(
+            var_list: list,
+            bins_input: Union[int, dict],
+            density_input: Union[str, dict],
+            cumulative_input: Union[str, dict],
+            df1: pd.core.frame.DataFrame,
+            df2: pd.core.frame.DataFrame = None,
+            ) -> None:
+        
     
-    number_of_graphs = len(var_list)
-    rows = find_number_of_rows(number_of_graphs)
-    columns = 3
-    max_plots  = rows*columns
+        number_of_graphs = len(var_list)
+        rows = find_number_of_rows(number_of_graphs)
+        columns = 3
+        max_plots  = rows*columns
 
-    if max_plots < number_of_graphs:
-        raise Exception('Error: The number of features must fit the the number of plots in the matrix: `rows*columns >= var_list`')
+        if max_plots < number_of_graphs:
+            raise Exception('Error: The number of features must fit the the number of plots in the matrix: `rows*columns >= var_list`')
 
-    fig, ax = plt.subplots(rows, columns, figsize=(columns*3.5, rows*3.5))
+        fig, ax = plt.subplots(rows, columns, figsize=(columns*3.5, rows*3.5))
 
-    plt.suptitle(
-        'Histograms',
-        size=20,
-        y=0.95
-        )
+        plt.suptitle(
+            'Histograms',
+            size=20,
+            y=1.01
+            )
 
-    df1 = df1[var_list]
-    
-    ax = ax.reshape(-1, 1)
+        df1 = df1[var_list]
+        
+        ax = ax.reshape(-1, 1)
 
-    for i in range(0, max_plots):
-        if i < number_of_graphs:
-            ax_ = ax[i, 0]
-            col = df1.columns[i]
-            ax_.set_title(col)
-            ax_.hist(df1[col], density=True, edgecolor="black", label='Main data frame')
-            if isinstance(df2, pd.core.frame.DataFrame):
-                ax_.hist(df2[col], density=True, edgecolor="orange",  histtype='step', label='Alternative')
-                if i == 0:
-                    ax_.legend(bbox_to_anchor=(0.5, 1.4))
-            ax_.grid(axis='y')
-            ax_.set_axisbelow(True)
-        else:
-            ax_ = ax[i, 0]
-            ax_.set_axis_off()
+        for i in range(0, max_plots):
+            if i < number_of_graphs:
+                ax_ = ax[i, 0]
+                col = df1.columns[i]
+                ax_.set_title(col)
 
-    plt.tight_layout()
-    plt.show()
+                bins_ = 10
+                density_ = False
+                cumulative_ = False
 
-# Box plot panel.
+                if bins_input is not None:
+                    if isinstance(bins_input, int):
+                        bins_ = bins_input
+                    
+                    if isinstance(bins_input, dict):
+                        if col in bins_input:   
+                            bins_ = bins_input[col]
+
+                if density_input is not None:
+                    if isinstance(density_input, bool):
+                        density_ = density_input
+                    if isinstance(density_input, dict):
+                        if col in density_input:
+                            density_ = density_input[col]
+
+                if cumulative_input is not None:
+                    if isinstance(cumulative_input, bool):
+                        cumulative_ = cumulative_input
+                    if isinstance(cumulative_input, dict):
+                        if col in cumulative_input:
+                            cumulative_ = cumulative_input[col]
+
+                ax_.hist(
+                    df1[col],
+                    edgecolor="black",
+                    label='Main data frame',
+                    density=density_,
+                    bins=bins_,
+                    cumulative=cumulative_,
+                    )
+                if isinstance(df2, pd.core.frame.DataFrame):
+                    ax_.hist(
+                        df2[col], 
+                        edgecolor="orange", 
+                        histtype='step',
+                        linewidth=3,
+                        label='Alternative',
+                        density=density_,
+                        bins=bins_,
+                        cumulative=cumulative_,
+                        )
+                    if i == 0:
+                        ax_.legend(bbox_to_anchor=(0.5, 1.4))
+                ax_.grid(axis='y')
+                ax_.set_axisbelow(True)
+            else:
+                ax_ = ax[i, 0]
+                ax_.set_axis_off()
+
+        plt.tight_layout()
+        plt.show()
+
+        return
+
 def boxplot_panel(
         var_list: list,
         df1: pd.core.frame.DataFrame,
@@ -149,60 +337,16 @@ def boxplot_panel(
     plt.tight_layout()
     plt.show()
 
+    return
 
 
-# Correlation heatmap.
-def heat_map(feats: list, df: pd.core.frame.DataFrame):
-    
-    corr = df[feats].corr(method='pearson', numeric_only=True)
-
-    length = len(feats)
-
-    if length > 30:
-        raise Exception('Too many variables (over 30) betray the purpose of the heatmap that is to facilitate the detection of extreme correlations by observation.')
-
-    size = 6 # figure size
-
-    # Mechanism to increase the figure size proportionally to the increase of the interval the variables
-    # belong to; the interval has periods of 5 variables in ends in 30.
-    intervals = pd.interval_range(
-        start=0, end=30, periods=5, closed='left'
-        )
-
-    for index, interval in enumerate(intervals):
-        multiplier = 1.2
-        if length in interval:
-            size_increment = round((index)*multiplier, 2)
-            size = size + size_increment
-
-    # Draw a heatmap with the numeric values in each cell.
-    fig, ax = plt.subplots(figsize=(size, size))
-
-    plt.title("Pearson's Correlation Heatmap", size=15)
-
-    # Getting the Upper Triangle of the co-relation matrix.
-    matrix = np.triu(corr)
-    annotations = [True if length <= 15 else False][0]
-    print(annotations)
-
-    sns.heatmap(corr,
-                annot=annotations,
-                linewidths=.5,
-                mask=matrix,
-                ax=ax)
-
-    plt.tight_layout()
-    plt.show()
-
-
-# Scatter plots panel.
 def scatterplot_panel(
     var_list: list,
     target_var: str,
     df1: pd.core.frame.DataFrame,
     df2: pd.core.frame.DataFrame = None,
     custom_title: str = None,
-    ):
+    ) -> None:
     """Choose a DataFrame, a list of independent variables, a target variable, and the configuration 
     of the panel: rows x columns; to produce a pre-configured panel of scatterplots.
     """
@@ -269,37 +413,116 @@ def scatterplot_panel(
     plt.tight_layout()
     plt.show()
 
+    return
+
+
+class Heat_Map:
+    def __init__(self, heatmap_hyperparameters: dict, split):
+        self.keys = ['df', 'variables']
+        full_dic = unfold_dictionary(heatmap_hyperparameters, self.keys)
+        self.split = split
+        self.variables_hp = full_dic['variables']
+        
+        if full_dic['df'] is None: 
+            self.df_hp = 'train'
+        else:
+            self.df_hp = full_dic['df']
+
+    def display_heat_map(self, data_sets: dict) -> None:
+
+        if self.split:
+            df = data_sets[self.df_hp]
+        else:
+            df = data_sets[self.df_hp]
+
+        corr = df[self.variables_hp].corr(method='pearson', numeric_only=True)
+
+        length = len(self.variables_hp)
+
+        if length > 30:
+            raise Exception('Too many variables (over 30) betray the purpose of the heatmap that is to facilitate the detection of extreme correlations by observation.')
+
+        size = 6 # figure size
+
+        # Mechanism to increase the figure size proportionally to the increase of the interval the variables
+        # belong to; the interval has periods of 5 variables in ends in 30.
+        intervals = pd.interval_range(
+            start=0, end=30, periods=5, closed='left'
+            )
+
+        for index, interval in enumerate(intervals):
+            multiplier = 1.2
+            if length in interval:
+                size_increment = round((index)*multiplier, 2)
+                size = size + size_increment
+
+        # Draw a heatmap with the numeric values in each cell.
+        fig, ax = plt.subplots(figsize=(size, size))
+
+        plt.title("Pearson's Correlation Heatmap", size=15)
+
+        # Getting the Upper Triangle of the co-relation matrix.
+        matrix = np.triu(corr)
+        annotations = [True if length <= 15 else False][0]
+
+        sns.heatmap(corr,
+                    annot=annotations,
+                    linewidths=.5,
+                    mask=matrix,
+                    ax=ax)
+
+        plt.tight_layout()
+        plt.show()
+
+        return
+
+
 
 # Scatter plot - queried/filtered dataframes.
-def scatter_compare_filtered(
-    y: str,
-    x: str,
-    filtered_dfs: list,
-    queries: list
-    ):
+class Scatterplot_Comparison:
+    keys = ['df', 'container', 'index', 'x', 'y',]
 
-    # plt.style.use('classic')
+    def scatterplot_comparison(
+        self,
+        df: str,    
+        y: str,
+        x: str,
+        filtered_sets: list,
+        container: list,
+        container_type: str, 
+        ) -> None:
 
-    colors = ['purple', 'blue', 'green', 'orange', 'black', 'yellow',]
+        colors = ['purple', 'blue', 'green', 'orange', 'black', 'yellow', 'red', 'brown']
 
-    fig, ax = plt.subplots(figsize=(4, 4))
+        if len(filtered_sets) > len(colors):
+            raise Exception('There are more arrays to fit in the scatterplot than colors to represent them.')
 
-    plt.suptitle(f'Queried Feature: {x} Vs {y}')
+        fig, ax = plt.subplots(figsize=(4, 4))
 
-    for i, df in enumerate(filtered_dfs):
-        # df = filtered_dfs[i]
-        ax.scatter(df[x], df[y], color=colors[i], label=queries[i])
-        ax.grid()
-        ax.set_axisbelow(True)
+        plt.suptitle(f'Queried Feature: {x} Vs {y} ({df} set)')
 
-    plt.legend(bbox_to_anchor=[1.0, 1.0])
-    plt.xlabel(x)
-    plt.ylabel(y)
-    
-    # plt.tight_layout()
-    plt.show()
-    
-    return  
+        for i, df in enumerate(filtered_sets):
+            # df = filtered_dfs[i]
+
+            condition = container[i]
+            
+            if container_type == 'trim':
+                label_ = ', '.join([f'{key}: {condition[key]}' for key in condition][1:])
+            if container_type == 'query':
+                label_ = condition
+            
+            ax.scatter(df[x], df[y], color=colors[i], label=label_)
+            ax.grid()
+            ax.set_axisbelow(True)
+
+        # plt.tight_layout()
+        plt.legend(loc='upper center', bbox_to_anchor=[0.2, -0.2])
+        plt.xlabel(x)
+        plt.ylabel(y)
+        
+        plt.show()
+        
+        return  
 
 
 # Scatter plots panel for residuals (train and test) vs target.
