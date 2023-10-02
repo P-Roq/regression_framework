@@ -8,6 +8,8 @@ import matplotlib.patches as mpatches # for custom legends in the graphs
 import seaborn as sns
 import statsmodels.api as sm
 
+from src.utils import unfold_dictionary
+
     
 @dataclass
 class Display_Panels:
@@ -15,8 +17,9 @@ class Display_Panels:
     def __init__(self, ctrl_display_panels: dict, all_data_sets_: dict, split: bool,):
         self.keys = ['df', 'container', 'index', 'panel']
 
-        only_nones = {key: None for key in self.keys if key not in ctrl_display_panels.keys()}
-        self.full_dic = {**ctrl_display_panels, **only_nones}
+        # only_nones = {key: None for key in self.keys if key not in ctrl_display_panels.keys()}
+        # self.full_dic = {**ctrl_display_panels, **only_nones}
+        self.full_dic = unfold_dictionary(ctrl_display_panels, self.keys)
     
         self.all_data_sets = all_data_sets_
         self.split = split
@@ -62,6 +65,9 @@ class Display_Panels:
 
         if (self.split is False) and (self.df_1_hp == 'main'):
             self.df_1_hp = 'train' 
+
+        if ((self.container_1_hp is None) and (self.container_2_hp is None)):
+            self.full_dic['index'] == (None, None)
     
     @property
     def type_check(self,):
@@ -75,13 +81,17 @@ class Display_Panels:
             if len(self.full_dic['df']) != 2:
                 raise Exception(f"If 'df' is a {type(self.full_dic['df'])}, it can only take two values - one for each data set.")
 
-        if self.full_dic['container'] is None:
-            if self.full_dic['index'] is not None:
+        if (self.full_dic['container'] is None) or ((self.container_1_hp is None) and (self.container_2_hp is None)):
+            if (self.full_dic['index'] is not None) and (self.full_dic['index'] == (None, None)):
                 raise Exception('No container has been selected, therefore an index cannot be passed as in input.')
 
         if isinstance(self.full_dic['container'], (list, tuple)):
             if len(self.full_dic['container']) != 2:
                 raise Exception(f"If 'container' is a {type(self.full_dic['container'])}, it can only take two values - one for each data set.")
+
+        if isinstance(self.full_dic['index'], (list, tuple)):
+            if len(self.full_dic['index']) != 2:
+                raise Exception(f"If 'index' is a {type(self.full_dic['index'])}, it can only take two values - one for each container.")
 
         return  
 
@@ -94,16 +104,19 @@ class Display_Panels:
             query_container_index = list(self.all_data_sets['query'].keys())
             if (self.container_1_hp == 'query'):
                 if self.index_1_hp not in query_container_index:
-                    raise Exception(f'The index specified for the query container, {self.index_1_hp}, does not correspond to any of the elements in the `query_container`. ')
+                    raise Exception(f'The index specified for the query container, `{self.index_1_hp}`, does not correspond to any of the elements in the `query_container`. ')
             
             if (self.container_2_hp == 'query'):
                 if self.index_2_hp not in query_container_index:
-                    raise Exception(f'The index specified for the query container, {self.index_2_hp}, does not correspond to any of the elements in the `query_container`. ')
+                    raise Exception(f'The index specified for the query container, `{self.index_2_hp}`, does not correspond to any of the elements in the `query_container`. ')
 
         if (self.full_dic['container'] == 'trim') or ('trim' in self.full_dic['container']):
             if self.all_data_sets['trim'] is None:
                 raise Exception('There are no trimmed versions available (check the `trim_container`).')
 
+        # if (isinstance(self.full_dic['container'], (tuple, list))) and (isinstance(self.full_dic['index'], (tuple, list))) 
+
+        return
 
 
     @property
@@ -403,48 +416,65 @@ def scatterplot_panel(
     return
 
 
-def heat_map(feats: list, df: pd.core.frame.DataFrame) -> None:
-    
-    corr = df[feats].corr(method='pearson', numeric_only=True)
+class Heat_Map:
+    def __init__(self, heatmap_hyperparameters: dict, split):
+        self.keys = ['df', 'variables']
+        full_dic = unfold_dictionary(heatmap_hyperparameters, self.keys)
+        self.split = split
+        self.variables_hp = full_dic['variables']
+        
+        if full_dic['df'] is None: 
+            self.df_hp = 'train'
+        else:
+            self.df_hp = full_dic['df']
 
-    length = len(feats)
+    def display_heat_map(self, data_sets: dict) -> None:
 
-    if length > 30:
-        raise Exception('Too many variables (over 30) betray the purpose of the heatmap that is to facilitate the detection of extreme correlations by observation.')
+        if self.split:
+            df = data_sets[self.df_hp]
+        else:
+            df = data_sets[self.df_hp]
 
-    size = 6 # figure size
+        corr = df[self.variables_hp].corr(method='pearson', numeric_only=True)
 
-    # Mechanism to increase the figure size proportionally to the increase of the interval the variables
-    # belong to; the interval has periods of 5 variables in ends in 30.
-    intervals = pd.interval_range(
-        start=0, end=30, periods=5, closed='left'
-        )
+        length = len(self.variables_hp)
 
-    for index, interval in enumerate(intervals):
-        multiplier = 1.2
-        if length in interval:
-            size_increment = round((index)*multiplier, 2)
-            size = size + size_increment
+        if length > 30:
+            raise Exception('Too many variables (over 30) betray the purpose of the heatmap that is to facilitate the detection of extreme correlations by observation.')
 
-    # Draw a heatmap with the numeric values in each cell.
-    fig, ax = plt.subplots(figsize=(size, size))
+        size = 6 # figure size
 
-    plt.title("Pearson's Correlation Heatmap", size=15)
+        # Mechanism to increase the figure size proportionally to the increase of the interval the variables
+        # belong to; the interval has periods of 5 variables in ends in 30.
+        intervals = pd.interval_range(
+            start=0, end=30, periods=5, closed='left'
+            )
 
-    # Getting the Upper Triangle of the co-relation matrix.
-    matrix = np.triu(corr)
-    annotations = [True if length <= 15 else False][0]
+        for index, interval in enumerate(intervals):
+            multiplier = 1.2
+            if length in interval:
+                size_increment = round((index)*multiplier, 2)
+                size = size + size_increment
 
-    sns.heatmap(corr,
-                annot=annotations,
-                linewidths=.5,
-                mask=matrix,
-                ax=ax)
+        # Draw a heatmap with the numeric values in each cell.
+        fig, ax = plt.subplots(figsize=(size, size))
 
-    plt.tight_layout()
-    plt.show()
+        plt.title("Pearson's Correlation Heatmap", size=15)
 
-    return
+        # Getting the Upper Triangle of the co-relation matrix.
+        matrix = np.triu(corr)
+        annotations = [True if length <= 15 else False][0]
+
+        sns.heatmap(corr,
+                    annot=annotations,
+                    linewidths=.5,
+                    mask=matrix,
+                    ax=ax)
+
+        plt.tight_layout()
+        plt.show()
+
+        return
 
 
 
