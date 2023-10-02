@@ -459,8 +459,9 @@ def main() -> None:
                 custom_title=c.scatterplots['title'],
                 )
             
-        if hasattr(c, 'heatmap'):                
-            dv.heat_map(c.heatmap, panel_comparison.df_1)
+    if hasattr(c, 'heat_map'):
+        heatmap = dv.Heat_Map(c.heat_map, split)                
+        heatmap.display_heat_map(data_sets)
 
     if (not hasattr(c, 'display_panels')) and\
         (hasattr(c, 'histograms') or hasattr(c, 'boxplots') or hasattr(c, 'scatterplots') or hasattr(c, 'heatmap')):

@@ -122,31 +122,35 @@ query_container = [
 
 #### Visualization panels.
 
-display_panels = {
-    'df': ('train', 'train'),
-    'container': (None,'query',), 
-    'index': (None, 6),
-    'panel': ['scatterplot',],
+# display_panels = {
+#     'df': ('train', 'train'),
+#     'container': (None, None), 
+#     'index': 1,
+#     'panel': ('scatterplot',),
+#     }
+
+
+# histograms = {
+#     'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges'],
+#     'bins': {'age': 5,},
+# 	'density': {'charges': True,},
+# 	'cumulative': {'bmi': True,}
+#     }
+
+# boxplots = ['age', 'bmi', 'children', 'charges']
+
+# scatterplots = {
+#     'target': 'charges',
+#     'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat'],
+#     'title': None
+#     } # 'Scatter Plots: Features Vs Target'
+
+
+heat_map = {
+    'df': 'train',
+    'variables': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges']
     }
 
-
-histograms = {
-    'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges'],
-    'bins': {'age': 5,},
-	'density': {'charges': True,},
-	'cumulative': {'bmi': True,}
-    }
-
-boxplots = ['age', 'bmi', 'children', 'charges']
-
-scatterplots = {
-    'target': 'charges',
-    'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat'],
-    'title': None
-    } # 'Scatter Plots: Features Vs Target'
-
-
-heatmap = ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges']
 
 
 #### Regressions preprocessing.
