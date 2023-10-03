@@ -163,24 +163,20 @@ Parameters:
 
 ## Data Visualization  
 
-To display the graph panels the user first sets up the `display_panels` with the data sets to be used and then the information regarding each panel via the following elements:
+To display the graph panels the user first sets up the `display_panels` to determine which data sets to visualize in the same panel (one or two), and also to chose which panel(s) to display the overlaid graphs if two data sets have been previously selected; secondly, it fills the information required for each type of graph in its own dedicated dictionary (if a dictionary is omitted, the associated panel will not be displayed):
     - `histograms`
     - `boxplots`
     - `scatterplots`
-<<<<<<< HEAD
-    - `heatmap`
 
-=======
->>>>>>> 7402ac569e30b289c905d997dc56e6cc28e8ab9f
-
-    - `df`: tuple[str, str], list[str, str]
-        - 
-    - `container`: `'trim'`, `'query'`, `None`
-        - The  
-    - `index`: str
+The hyperparameters in `display_panels`:
+    - `df`:  `'main'`, `'train'`, `'validation'`, `'test'`, `None`, tuple[str, str], list[str, str].
+        - To pass only one data set a string suffices. To choose two data sets they must be passed in either a tuple of a list, e.g. `('train', 'validation')`, `(None, 'train')`. `'None'` selects by default the unmodified 'train' data set if there was a data split, and the 'main' data set if there was no split. 
+    - `container`: `'trim'`, `'query'`, `None`, tuple[str, str], list[str, str].
+        - The same logic is applied in this case. If only one data set was previously passed in `df`, the user passes on of the single values available; if two data sets were passed, a pair of values inside a tuple or a list must be passed to determine if the data sets to be used are unmodified or modified, e.g. `(None, 'trim')`, `(trim, query)`
+    - `index`: int, tuple[int, int], list[int, int]
         - if containers were set with either `'trim'` or `'query'`, the index of identifies which data set version to fetch within the chosen container.  
-    - `panel`: str, list[str], tuple[str]: 
-        - the comparison can be made for any of the following three types of graph, co-currently or not: `'histogram'`, `'boxplot'` and `'scatterplot'` panels.  
+    - `panel`: `'histogram'`, `'boxplot'` and `'scatterplot'`, list[str], tuple[str]: 
+        - the comparison can be made for any of the following three types of graph, co-currently or not: histogram, box plot, scatter plot.  
 
 
 ## Histogram Panel

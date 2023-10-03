@@ -83,7 +83,7 @@ class Display_Panels:
 
         if (self.full_dic['container'] is None) or ((self.container_1_hp is None) and (self.container_2_hp is None)):
             if (self.full_dic['index'] is not None) and (self.full_dic['index'] == (None, None)):
-                raise Exception('No container has been selected, therefore an index cannot be passed as in input.')
+                raise Exception('No container has been selected, therefore an index cannot be passed as input.')
 
         if isinstance(self.full_dic['container'], (list, tuple)):
             if len(self.full_dic['container']) != 2:
@@ -423,12 +423,21 @@ class Heat_Map:
         self.split = split
         self.variables_hp = full_dic['variables']
         
-        if full_dic['df'] is None: 
-            self.df_hp = 'train'
+        if split:
+            if full_dic['df'] is None: 
+                self.df_hp = 'train'
+                self.set_name = 'train'
+            else:
+                self.df_hp = full_dic['df']
+                self.set_name = full_dic['df']
         else:
-            self.df_hp = full_dic['df']
+            if (full_dic['df'] is None) or (full_dic['df'] in ['main', 'train']):
+                self.df_hp = 'train'
+                self.set_name = 'main'
+            else:
+                raise Exception(f"If the data has not been split, only 'main' or 'train' can be passed to `df`.")
 
-    def display_heat_map(self, data_sets: dict) -> None:
+    def display_heat_map(self, data_sets: dict,) -> None:
 
         if self.split:
             df = data_sets[self.df_hp]
@@ -459,7 +468,7 @@ class Heat_Map:
         # Draw a heatmap with the numeric values in each cell.
         fig, ax = plt.subplots(figsize=(size, size))
 
-        plt.title("Pearson's Correlation Heatmap", size=15)
+        plt.title(f"Pearson's Correlation Heatmap ({self.set_name} set).", size=15)
 
         # Getting the Upper Triangle of the co-relation matrix.
         matrix = np.triu(corr)
