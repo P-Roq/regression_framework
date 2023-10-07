@@ -163,11 +163,7 @@ Parameters:
 
 ## Data Visualization  
 
-<<<<<<< HEAD
 To display the graph panels the user first sets up the `display_panels` to determine which data sets to visualize in the same panel (one or two), and also to chose which panel(s) to display the overlaid graphs if two data sets have been selected; secondly, it fills the information required for each type of graph in its own dedicated dictionary (if a dictionary is omitted, the associated panel will not be displayed):
-=======
-To display the graph panels the user first sets up the `display_panels` to determine which data sets to visualize in the same panel (one or two), and also to chose which panel(s) to display the overlaid graphs if two data sets have been previously selected; secondly, it fills the information required for each type of graph in its own dedicated dictionary (if a dictionary is omitted, the associated panel will not be displayed):
->>>>>>> 4b4652bbe794f6a33d0da3d89c73d98ffea315a8
     - `histograms`
     - `boxplots`
     - `scatterplots`
