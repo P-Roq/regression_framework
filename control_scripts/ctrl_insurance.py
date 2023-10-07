@@ -63,11 +63,11 @@ convert_to_categorical = [
 
 #### Split data.
 
-# split_data = {
-#     'rand_state': [5, 5],
-#     'proportions': (0.6, 0.2,), 
-#     'shuffle': False,
-#     }
+split_data = {
+    'rand_state': [5, 5],
+    'proportions': (0.6, 0.2,), 
+    'shuffle': False,
+    }
 
 # standardize_data = {'transform': 'z_score',  'include_binary': ['smoker_d'], 'round': 2} #'include_binary': True,   
 
@@ -122,35 +122,39 @@ query_container = [
 
 #### Visualization panels.
 
-# display_panels = {
-#     'df': ('train', 'train'),
-#     'container': (None, None), 
-#     'index': 1,
-#     'panel': ('scatterplot',),
-#     }
+display_panels = {
+    'df': ('main', 'train'),
+    'container': None, 
+    'index': None,
+    'panel': ('scatterplot',),
+    }
 
+# display_panels = {
+#     'df': 'train',
+#     'container': 'query', 
+#     'index': 1,
+#     'panel': None,
+#     }
 
 # histograms = {
 #     'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges'],
 #     'bins': {'age': 5,},
-# 	'density': {'charges': True,},
-# 	'cumulative': {'bmi': True,}
+# 	  'density': {'charges': True,},
+# 	  'cumulative': {'bmi': True,}
 #     }
 
 # boxplots = ['age', 'bmi', 'children', 'charges']
 
-# scatterplots = {
-#     'target': 'charges',
-#     'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat'],
-#     'title': None
-#     } # 'Scatter Plots: Features Vs Target'
-
+scatterplots = {
+    'target': 'charges',
+    'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat'],
+    'title': None
+    } # 'Scatter Plots: Features Vs Target'
 
 heat_map = {
     'df': 'train',
     'variables': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges']
     }
-
 
 
 #### Regressions preprocessing.

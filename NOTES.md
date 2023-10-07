@@ -163,30 +163,26 @@ Parameters:
 
 ## Data Visualization  
 
-To display the graph panels the user first sets up the `display_panels` with the data sets to be used and then the information regarding each panel via the following elements:
+To display the graph panels the user first sets up the `display_panels` to determine which data sets to visualize in the same panel (one or two), and also to chose which panel(s) to display the overlaid graphs if two data sets have been selected; secondly, it fills the information required for each type of graph in its own dedicated dictionary (if a dictionary is omitted, the associated panel will not be displayed):
     - `histograms`
     - `boxplots`
     - `scatterplots`
-<<<<<<< HEAD
-    - `heatmap`
 
-=======
->>>>>>> 7402ac569e30b289c905d997dc56e6cc28e8ab9f
-
-    - `df`: tuple[str, str], list[str, str]
-        - 
-    - `container`: `'trim'`, `'query'`, `None`
-        - The  
-    - `index`: str
-        - if containers were set with either `'trim'` or `'query'`, the index of identifies which data set version to fetch within the chosen container.  
-    - `panel`: str, list[str], tuple[str]: 
-        - the comparison can be made for any of the following three types of graph, co-currently or not: `'histogram'`, `'boxplot'` and `'scatterplot'` panels.  
+The hyperparameters in `display_panels`:
+    - `df`:  `'main'`, `'train'`, `'validation'`, `'test'`, `None`, tuple[str, str], list[str, str].
+        - To chose a single data set, the user sets `df` with one of the strings above. To choose two data sets they must be passed in as a two element tuple or list, e.g. `('train', 'validation')`, `(None, 'train')`, where the first element indicates the main data set to be plotted, and the second element indicates the secondary data set to be plotted. `'None'` selects by default the unmodified 'train' data set if there was a data split, and the 'main' data set if there was no split. 
+    - `container`: `'trim'`, `'query'`, `None`, tuple[str, str], list[str, str].
+        - The same logic is applied in this case, if a single data set was previously passed to `df`, then `container` can take one of the values above: `None` to choose unmodified data sets, `'trim'` or `'query'` to chose a modified data set; if two data sets were passed in `'df'`, a two-element tuple or list must be passed to determine whether those data sets are unmodified or modified, e.g. `(None, 'trim')`, `(trim, query)`.
+    - `index`: int, tuple[int, int], list[int, int]
+        - if containers were set with either `'trim'` or `'query'`, the index identifies which data set version to fetch within the associated ('trim' or 'query') container.   
+    - `panel`: `'histogram'`, `'boxplot'` and `'scatterplot'`, list[str], tuple[str]: 
+        - the comparison can be made for any of the following three types of graphs, co-currently or not: histogram, box plot, scatter plot.  
 
 
 ## Histogram Panel
 
 `histogram` is the dictionary used to set the histogram panel parameters. It always requires the item 'features', which provides the list of variables from which to build the histograms. Three other optional items can added to affect specified variables/histograms or all of them:
-    - 'bins': to change the number of bins for a particular variable include them into a dictionary; the default value is 10 bins, e.g.:
+    - `'bins'`: to change the number of bins for a particular variable include them into a dictionary; the default value is 10 bins, e.g.:
         `histogram = {
             'features': ['var_a', 'var_b', 'var_c'],
             'bins': {'var_a': 8, 'var_b': 5}
@@ -198,7 +194,7 @@ To display the graph panels the user first sets up the `display_panels` with the
             'bins': 20
             }`
 
-    - 'density': bins represents a probability density instead of absolute values for a specific variable(s), e.g.:
+    - `'density'`: bins represents a probability density instead of absolute values for a specific variable(s), e.g.:
         `histogram = {
             'features': ['var_a', 'var_b', 'var_c'],
             'density': {'var_a': True}
@@ -210,7 +206,7 @@ To display the graph panels the user first sets up the `display_panels` with the
             'density': True
             }`
 
-    - 'cumulative': each bin represents the sum of the current bin count plus the previous bin counts; can be switched to a probability density representation if 'density' is activated; if a negative number is placed instead of `True` the direction of accumulation is reversed, e.g.:
+    - `'cumulative'`: each bin represents the sum of the current bin count plus the previous bin counts; can be switched to a probability density representation if `'density'` is activated; if a negative number is placed instead of `True` the direction of accumulation is reversed, e.g.:
         `histogram = {
             'features': ['var_a', 'var_b', 'var_c'],
             'density': {'var_a': True, 'var_c': -1}
@@ -247,25 +243,25 @@ The feature selection process is activated when the program detects at least one
 Dictionaries have specific parameters according to the type of container/algorithm they belong to:
 
 - Univariate:
-    - target: str, 
-    - k_vars: int,
-    - criterion: callable (str)
+    - `'target'`: str, 
+    - `'k_vars'`: int,
+    - `'criterion'`: callable (str)
 
 - Recursive elimination:
-    - target: str, 
-    - k_vars: int,
-    - step: str, float
+    - `'target'`: str, 
+    - `'k_vars'`: int,
+    - `'step'`: str, float
 
 - Sequential/step-wise:
-    - target: str, 
-    - k_vars: int,
-    - direction: 'forward' or 'backward' (str),
-    - tolerance: float
+    - `'target'`: str, 
+    - `'k_vars'`: int,
+    - `'direction'`: 'forward' or 'backward' (str),
+    - `'tolerance'`: float
 
 - Importance weights:
-    - target: str, 
-    - k_vars: int,
-    - threshold: str, float
+    - `'target'`: str, 
+    - `'k_vars'`: int,
+    - `'threshold'`: str, float
 
 
 After the all the whole process has ran, the program prints:

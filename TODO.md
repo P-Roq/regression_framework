@@ -1,8 +1,6 @@
 ## To-do list:
 
-    - [software design] debloat 'main.py' so that the data wrangling/processing and the regression sections can work has decoupled blocks, allowing an easy implementation of future blocks.  
-
-    - [software design] build classes for all the functions that use the elements in the control script has input, in order to create support functions that have as their sole purpose to check and raise custom error messages if the values inserted do not belong to the types accept?  
+    - [Software design] debloat 'main.py' so that the data wrangling/processing and the regression sections can work has decoupled blocks, allowing an easy implementation of future blocks.  
     
     - Incorporate `residuals_set` in `residuals_analysis`.
 
@@ -34,9 +32,11 @@
 
     - Include an option to print a regression script based on the arguments chosen. The idea that, in the case the framework does not have the functionalities the user requires in his/hers analysis, he/she can export a closer version as a script and modify/include the functionality without having to write the analysis from the ground up, outside the framework/program. 
 
-    - Inclusion of PCA analysis for VIF and feature selection analysis. 
+    - Inclusion of PCA as part of the feature selection stage. 
 
     - Consider adding a secondary control file for a deeper customization of some aspects of data visualization.
+  
+    - [Software design] build classes for all the functions that use the elements in the control script as input, in order to create support functions to check and raise custom error messages if the values inserted do not belong to the types accept. [Use pydantic as an alternative?] 
 
     - [Best Practice] Revise control hyperparameter names.
     - [Best Practice] Start all functions' names with verbs, e.g. `do_something()`.
@@ -184,9 +184,11 @@
 
     - Reformulation of the visualization section: histograms, box plots, scatter plots and correlation heat map are now controlled by the hyperparameters in the dictionary `display_panels`: these hyperparameters allow to visually compare data sets by sub set - 'main', 'train', 'validation', 'test', and by transformation - trim or query. 
 
-    - 'Checking Non-numerical Variables' revised to accommodate split data sets.
+    - 'Checking Non-numerical Variables' has been revised to accommodate split data sets.
 
     - The Pearson correlation table given by the control parameter `correlations` has been revised to accommodate split data sets.
+
+    - The Pearson correlation heat map has been revised to accommodate split data sets.
 
 
 ## Current task
