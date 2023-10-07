@@ -133,11 +133,16 @@ scatterplots = {
     } # 'Scatter Plots: Features Vs Target'
 
 
+scatterplots = {
+    'target': 'charges',
+    'features': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat'],
+    'title': None
+    } # 'Scatter Plots: Features Vs Target'
+
 heat_map = {
     'df': 'train',
     'variables': ['age', 'sex_d', 'bmi', 'children', 'smoker_d', 'region_cat', 'charges']
     }
-
 
 
 #### Regressions preprocessing.
